@@ -18,9 +18,13 @@ interface BookingModalProps {
   machinery: {
     id: string;
     name: string;
-    type: string;
+    type?: string;
+    category?: string;
     rate: number;
-    ownerName: string;
+    owner?: {
+      name: string;
+    };
+    ownerName?: string;
   } | null;
   onConfirm: (bookingDetails: {
     machineId: string;
@@ -75,10 +79,10 @@ export const BookingModal = ({ isOpen, onClose, machinery, onConfirm }: BookingM
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <div className="text-sm">
-              <span className="font-medium">Type:</span> {machinery.type}
+              <span className="font-medium">Type:</span> {machinery.type || machinery.category}
             </div>
             <div className="text-sm">
-              <span className="font-medium">Owner:</span> {machinery.ownerName}
+              <span className="font-medium">Owner:</span> {machinery.ownerName || machinery.owner?.name}
             </div>
             <div className="text-sm">
               <span className="font-medium">Rate:</span> ₹{machinery.rate}/hour

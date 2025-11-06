@@ -8,6 +8,8 @@ import { Footer } from "@/components/Footer";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import MachineryList from "./pages/MachineryList";
+import AdvancedSearch from "./pages/AdvancedSearch";
+import OwnerRegistration from "./pages/OwnerRegistration";
 import DashboardFarmer from "./pages/DashboardFarmer";
 import DashboardOwner from "./pages/DashboardOwner";
 import DashboardAgent from "./pages/DashboardAgent";
@@ -29,6 +31,8 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/machinery" element={<MachineryList />} />
+              <Route path="/search" element={<AdvancedSearch />} />
+              <Route path="/register/owner" element={<OwnerRegistration />} />
               <Route path="/dashboard/farmer" element={<DashboardFarmer />} />
               <Route path="/dashboard/owner" element={<DashboardOwner />} />
               <Route path="/dashboard/agent" element={<DashboardAgent />} />

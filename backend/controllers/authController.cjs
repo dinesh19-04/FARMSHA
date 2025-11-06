@@ -8,7 +8,15 @@ const users = [];
 const register = async (req, res) => {
   try {
     console.log('Registration request received:', req.body);
-    const { name, email, password, phone, role } = req.body;
+    const { 
+      name, 
+      email, 
+      password, 
+      phone, 
+      role,
+      location,
+      machinery 
+    } = req.body;
 
     // Check if user already exists
     if (users.find(user => user.email === email)) {
@@ -19,14 +27,17 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+    // Create new user with enhanced data for machinery owners
     const newUser = {
       id: users.length + 1,
       name,
       email,
       password: hashedPassword,
       phone,
-      role: role || 'farmer' // default role
+      role: role || 'farmer', // default role
+      location: role === 'owner' ? location : null,
+      machinery: role === 'owner' ? machinery : null,
+      registrationDate: new Date().toISOString()
     };
 
     users.push(newUser);

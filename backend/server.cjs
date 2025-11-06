@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes.cjs');
 const ownerRoutes = require('./routes/ownerRoutes.cjs');
 const agentRoutes = require('./routes/agentRoutes.cjs');
+const searchRoutes = require('./routes/searchRoutes.cjs');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/agent', agentRoutes);
+app.use('/api/search', searchRoutes);
 
 const PORT = process.env.PORT || 5000;
 
