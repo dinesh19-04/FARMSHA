@@ -4,7 +4,8 @@ const {
   searchMachinery,
   getLocationOptions,
   getDistrictsByState,
-  getVillagesByDistrict,
+  getTaluksByDistrict,
+  getVillagesByTaluk,
   getMachineryById,
   getMachineryTypes
 } = require('../controllers/searchController.cjs');
@@ -21,8 +22,11 @@ router.get('/locations', getLocationOptions);
 // Get districts by state
 router.get('/locations/:state/districts', getDistrictsByState);
 
-// Get villages by district
-router.get('/locations/:state/:district/villages', getVillagesByDistrict);
+// Get taluks by district
+router.get('/locations/:state/:district/taluks', getTaluksByDistrict);
+
+// Get villages by taluk
+router.get('/locations/:state/:district/:taluk/villages', getVillagesByTaluk);
 
 // Get machinery types with counts
 router.get('/types', getMachineryTypes);

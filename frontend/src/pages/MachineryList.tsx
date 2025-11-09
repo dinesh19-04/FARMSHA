@@ -24,6 +24,7 @@ interface Machinery {
   location: {
     state: string;
     district: string;
+    taluk: string;
     village: string;
     pincode: string;
   };
@@ -160,7 +161,7 @@ export default function MachineryList() {
                 name={machine.name}
                 type={machine.category}
                 rate={machine.rate}
-                location={`${machine.location.village}, ${machine.location.district}, ${machine.location.state}`}
+                location={`${machine.location.village}, ${machine.location.taluk}, ${machine.location.district}, ${machine.location.state}`}
                 available={machine.available}
                 onBook={handleBook}
               />

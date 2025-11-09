@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 interface LocationData {
   state: string;
   district: string;
+  taluk: string;
   village: string;
   pincode: string;
 }
@@ -70,6 +71,7 @@ export const OwnerRegistrationForm = ({ onSubmit, isLoading }: OwnerRegistration
     location: {
       state: "",
       district: "",
+      taluk: "",
       village: "",
       pincode: ""
     },
@@ -184,10 +186,10 @@ export const OwnerRegistrationForm = ({ onSubmit, isLoading }: OwnerRegistration
       return;
     }
 
-    if (!formData.location.state || !formData.location.district || !formData.location.village) {
+    if (!formData.location.state || !formData.location.district || !formData.location.taluk || !formData.location.village) {
       toast({
         title: "Missing Location",
-        description: "Please provide complete location details.",
+        description: "Please provide complete location details including taluk.",
         variant: "destructive"
       });
       return;
@@ -295,6 +297,16 @@ export const OwnerRegistrationForm = ({ onSubmit, isLoading }: OwnerRegistration
                     value={formData.location.district}
                     onChange={(e) => handleInputChange("location.district", e.target.value)}
                     placeholder="Enter district name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="taluk">Taluk *</Label>
+                  <Input
+                    id="taluk"
+                    value={formData.location.taluk}
+                    onChange={(e) => handleInputChange("location.taluk", e.target.value)}
+                    placeholder="Enter taluk name"
                     required
                   />
                 </div>

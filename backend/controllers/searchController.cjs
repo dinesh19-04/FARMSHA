@@ -16,6 +16,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Amritsar",
+      taluk: "Majitha",
       village: "Majitha",
       pincode: "143601",
       coordinates: { lat: 31.6340, lng: 74.8723 }
@@ -45,6 +46,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Ludhiana",
+      taluk: "Ludhiana",
       village: "Pakhowal",
       pincode: "141013",
       coordinates: { lat: 30.9010, lng: 75.8573 }
@@ -74,6 +76,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Jalandhar",
+      taluk: "Nakodar",
       village: "Nakodar",
       pincode: "144040",
       coordinates: { lat: 31.1260, lng: 75.4735 }
@@ -103,6 +106,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Patiala",
+      taluk: "Samana",
       village: "Samana",
       pincode: "147001",
       coordinates: { lat: 30.3398, lng: 76.3869 }
@@ -132,6 +136,7 @@ const machineryDatabase = [
     location: {
       state: "Haryana",
       district: "Karnal",
+      taluk: "Assandh",
       village: "Assandh",
       pincode: "132039",
       coordinates: { lat: 29.5218, lng: 76.6066 }
@@ -161,6 +166,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Moga",
+      taluk: "Baghapurana",
       village: "Baghapurana",
       pincode: "142038",
       coordinates: { lat: 30.6890, lng: 75.0974 }
@@ -190,6 +196,7 @@ const machineryDatabase = [
     location: {
       state: "Uttar Pradesh",
       district: "Meerut",
+      taluk: "Sardhana",
       village: "Sardhana",
       pincode: "250342",
       coordinates: { lat: 29.1492, lng: 77.6130 }
@@ -219,6 +226,7 @@ const machineryDatabase = [
     location: {
       state: "Maharashtra",
       district: "Pune",
+      taluk: "Baramati",
       village: "Baramati",
       pincode: "413102",
       coordinates: { lat: 18.1124, lng: 74.5815 }
@@ -248,6 +256,7 @@ const machineryDatabase = [
     location: {
       state: "Gujarat",
       district: "Ahmedabad",
+      taluk: "Dholka",
       village: "Dholka",
       pincode: "382225",
       coordinates: { lat: 22.7279, lng: 72.4418 }
@@ -277,6 +286,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Bathinda",
+      taluk: "Rampura Phul",
       village: "Rampura Phul",
       pincode: "151103",
       coordinates: { lat: 30.2586, lng: 75.2441 }
@@ -306,6 +316,7 @@ const machineryDatabase = [
     location: {
       state: "Punjab",
       district: "Ferozepur",
+      taluk: "Zira",
       village: "Zira",
       pincode: "152024",
       coordinates: { lat: 30.9686, lng: 74.9910 }
@@ -335,6 +346,7 @@ const machineryDatabase = [
     location: {
       state: "Rajasthan",
       district: "Jaipur",
+      taluk: "Chomu",
       village: "Chomu",
       pincode: "303702",
       coordinates: { lat: 27.1592, lng: 75.7138 }
@@ -350,16 +362,18 @@ const machineryDatabase = [
   }
 ];
 
-// Get all unique states, districts, and villages for filter options
+// Get all unique states, districts, taluks, and villages for filter options
 const getLocationOptions = (req, res) => {
   try {
     const states = [...new Set(machineryDatabase.map(item => item.location.state))].sort();
     const districts = [...new Set(machineryDatabase.map(item => item.location.district))].sort();
+    const taluks = [...new Set(machineryDatabase.map(item => item.location.taluk))].sort();
     const villages = [...new Set(machineryDatabase.map(item => item.location.village))].sort();
     
     res.json({
       states,
       districts,
+      taluks,
       villages
     });
   } catch (error) {
@@ -385,15 +399,36 @@ const getDistrictsByState = (req, res) => {
   }
 };
 
-// Get villages by district
-const getVillagesByDistrict = (req, res) => {
+// Get taluks by district
+const getTaluksByDistrict = (req, res) => {
   try {
     const { state, district } = req.params;
-    const villages = [...new Set(
+    const taluks = [...new Set(
       machineryDatabase
         .filter(item => 
           item.location.state.toLowerCase() === state.toLowerCase() &&
           item.location.district.toLowerCase() === district.toLowerCase()
+        )
+        .map(item => item.location.taluk)
+    )].sort();
+    
+    res.json({ taluks });
+  } catch (error) {
+    console.error('Error fetching taluks:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get villages by taluk
+const getVillagesByTaluk = (req, res) => {
+  try {
+    const { state, district, taluk } = req.params;
+    const villages = [...new Set(
+      machineryDatabase
+        .filter(item => 
+          item.location.state.toLowerCase() === state.toLowerCase() &&
+          item.location.district.toLowerCase() === district.toLowerCase() &&
+          item.location.taluk.toLowerCase() === taluk.toLowerCase()
         )
         .map(item => item.location.village)
     )].sort();
@@ -413,6 +448,7 @@ const searchMachinery = (req, res) => {
       type = '',
       state = '',
       district = '',
+      taluk = '',
       village = '',
       available = '',
       minRate = '',
@@ -437,6 +473,7 @@ const searchMachinery = (req, res) => {
       // Location filters
       const matchesState = !state || item.location.state.toLowerCase() === state.toLowerCase();
       const matchesDistrict = !district || item.location.district.toLowerCase() === district.toLowerCase();
+      const matchesTaluk = !taluk || item.location.taluk.toLowerCase() === taluk.toLowerCase();
       const matchesVillage = !village || item.location.village.toLowerCase() === village.toLowerCase();
 
       // Availability filter
@@ -449,7 +486,7 @@ const searchMachinery = (req, res) => {
       const matchesMaxRate = !maxRate || item.rate <= parseInt(maxRate);
 
       return matchesQuery && matchesType && matchesState && matchesDistrict && 
-             matchesVillage && matchesAvailability && matchesMinRate && matchesMaxRate;
+             matchesTaluk && matchesVillage && matchesAvailability && matchesMinRate && matchesMaxRate;
     });
 
     // Sorting
@@ -552,7 +589,8 @@ module.exports = {
   searchMachinery,
   getLocationOptions,
   getDistrictsByState,
-  getVillagesByDistrict,
+  getTaluksByDistrict,
+  getVillagesByTaluk,
   getMachineryById,
   getMachineryTypes
 };

@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 interface LocationOptions {
   states: string[];
   districts: string[];
+  taluks: string[];
   villages: string[];
 }
 
@@ -36,6 +37,7 @@ interface SearchFilters {
   type: string;
   state: string;
   district: string;
+  taluk: string;
   village: string;
   available: string;
   minRate: number;
@@ -60,6 +62,7 @@ interface Machinery {
   location: {
     state: string;
     district: string;
+    taluk: string;
     village: string;
     pincode: string;
   };
@@ -91,6 +94,7 @@ export default function AdvancedSearch() {
   const [locationOptions, setLocationOptions] = useState<LocationOptions>({
     states: [],
     districts: [],
+    taluks: [],
     villages: []
   });
   const [machineryTypes, setMachineryTypes] = useState<MachineryType[]>([]);
@@ -105,6 +109,7 @@ export default function AdvancedSearch() {
     type: "",
     state: "",
     district: "",
+    taluk: "",
     village: "",
     available: "",
     minRate: 0,
@@ -124,17 +129,25 @@ export default function AdvancedSearch() {
   useEffect(() => {
     if (filters.state) {
       fetchDistrictsByState(filters.state);
-      setFilters(prev => ({ ...prev, district: "", village: "" }));
+      setFilters(prev => ({ ...prev, district: "", taluk: "", village: "" }));
     }
   }, [filters.state]);
 
-  // Fetch villages when district changes
+  // Fetch taluks when district changes
   useEffect(() => {
     if (filters.state && filters.district) {
-      fetchVillagesByDistrict(filters.state, filters.district);
-      setFilters(prev => ({ ...prev, village: "" }));
+      fetchTaluksByDistrict(filters.state, filters.district);
+      setFilters(prev => ({ ...prev, taluk: "", village: "" }));
     }
   }, [filters.district]);
+
+  // Fetch villages when taluk changes
+  useEffect(() => {
+    if (filters.state && filters.district && filters.taluk) {
+      fetchVillagesByTaluk(filters.state, filters.district, filters.taluk);
+      setFilters(prev => ({ ...prev, village: "" }));
+    }
+  }, [filters.taluk]);
 
   const fetchLocationOptions = async () => {
     try {
@@ -156,9 +169,19 @@ export default function AdvancedSearch() {
     }
   };
 
-  const fetchVillagesByDistrict = async (state: string, district: string) => {
+  const fetchTaluksByDistrict = async (state: string, district: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/search/locations/${encodeURIComponent(state)}/${encodeURIComponent(district)}/villages`);
+      const response = await fetch(`http://localhost:8000/api/search/locations/${encodeURIComponent(state)}/${encodeURIComponent(district)}/taluks`);
+      const data = await response.json();
+      setLocationOptions(prev => ({ ...prev, taluks: data.taluks }));
+    } catch (error) {
+      console.error('Error fetching taluks:', error);
+    }
+  };
+
+  const fetchVillagesByTaluk = async (state: string, district: string, taluk: string) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/search/locations/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${encodeURIComponent(taluk)}/villages`);
       const data = await response.json();
       setLocationOptions(prev => ({ ...prev, villages: data.villages }));
     } catch (error) {
@@ -212,6 +235,7 @@ export default function AdvancedSearch() {
       type: "",
       state: "",
       district: "",
+      taluk: "",
       village: "",
       available: "",
       minRate: 0,
@@ -291,7 +315,7 @@ export default function AdvancedSearch() {
               {/* Location Filters */}
               <div>
                 <Label className="text-base font-medium mb-3 block">Location</Label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <Label htmlFor="state">State</Label>
                     <Select value={filters.state} onValueChange={(value) => handleFilterChange('state', value)}>
@@ -325,11 +349,29 @@ export default function AdvancedSearch() {
                     </Select>
                   </div>
                   <div>
+                    <Label htmlFor="taluk">Taluk</Label>
+                    <Select 
+                      value={filters.taluk} 
+                      onValueChange={(value) => handleFilterChange('taluk', value)}
+                      disabled={!filters.district}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Taluk" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All Taluks</SelectItem>
+                        {locationOptions.taluks.map((taluk) => (
+                          <SelectItem key={taluk} value={taluk}>{taluk}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <Label htmlFor="village">Village/Town</Label>
                     <Select 
                       value={filters.village} 
                       onValueChange={(value) => handleFilterChange('village', value)}
-                      disabled={!filters.district}
+                      disabled={!filters.taluk}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select Village/Town" />
