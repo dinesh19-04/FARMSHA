@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock } from "lucide-react";
+import { MapPin, Clock, Navigation } from "lucide-react";
 
 interface MachineryCardProps {
   id: string;
@@ -9,6 +9,7 @@ interface MachineryCardProps {
   rate: number;
   location: string;
   available: boolean;
+  distance?: number;
   image?: string;
   onBook: (id: string) => void;
 }
@@ -20,6 +21,7 @@ export const MachineryCard = ({
   rate,
   location,
   available,
+  distance,
   image,
   onBook,
 }: MachineryCardProps) => {
@@ -48,6 +50,12 @@ export const MachineryCard = ({
           <MapPin className="h-4 w-4" />
           <span>{location}</span>
         </div>
+        {distance && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <Navigation className="h-4 w-4" />
+            <span>{distance} km away</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 text-lg font-bold text-primary">
           <Clock className="h-4 w-4" />
           <span>₹{rate}/hour</span>
