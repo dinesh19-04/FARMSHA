@@ -10,6 +10,8 @@ import Auth from "./pages/Auth";
 import MachineryList from "./pages/MachineryList";
 import AdvancedSearch from "./pages/AdvancedSearch";
 import OwnerRegistration from "./pages/OwnerRegistration";
+import AgentRegistration from "./pages/AgentRegistration";
+import CustomerRegistration from "./pages/CustomerRegistration";
 import DashboardFarmer from "./pages/DashboardFarmer";
 import DashboardOwner from "./pages/DashboardOwner";
 import DashboardAgent from "./pages/DashboardAgent";
@@ -33,6 +35,8 @@ const App = () => (
               <Route path="/machinery" element={<MachineryList />} />
               <Route path="/search" element={<AdvancedSearch />} />
               <Route path="/register/owner" element={<OwnerRegistration />} />
+              <Route path="/register/agent" element={<AgentRegistration />} />
+              <Route path="/register/customer" element={<CustomerRegistration />} />
               <Route path="/dashboard/farmer" element={<DashboardFarmer />} />
               <Route path="/dashboard/owner" element={<DashboardOwner />} />
               <Route path="/dashboard/agent" element={<DashboardAgent />} />

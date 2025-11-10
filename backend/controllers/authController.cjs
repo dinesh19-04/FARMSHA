@@ -15,7 +15,9 @@ const register = async (req, res) => {
       phone, 
       role,
       location,
-      machinery 
+      machinery,
+      agentInfo,
+      customerInfo
     } = req.body;
 
     // Check if user already exists
@@ -27,7 +29,7 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user with enhanced data for machinery owners
+    // Create new user with enhanced data for different user types
     const newUser = {
       id: users.length + 1,
       name,
@@ -35,8 +37,10 @@ const register = async (req, res) => {
       password: hashedPassword,
       phone,
       role: role || 'farmer', // default role
-      location: role === 'owner' ? location : null,
+      location: ['owner', 'agent', 'customer'].includes(role) ? location : null,
       machinery: role === 'owner' ? machinery : null,
+      agentInfo: role === 'agent' ? agentInfo : null,
+      customerInfo: role === 'customer' ? customerInfo : null,
       registrationDate: new Date().toISOString()
     };
 
