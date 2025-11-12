@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { MachineryCard } from "@/components/MachineryCard";
 import { MachineryMap } from "@/components/MachineryMap";
 import { BookingModal } from "@/components/BookingModal";
@@ -6,203 +6,127 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, SlidersHorizontal, Loader2, Map, List, MapPin, Navigation } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List, MapPin, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { calculateDistance, getCoordinatesFromLocation } from "@/utils/distance";
+import { calculateDistance } from "@/utils/distance";
+import { useMachinery } from "@/context/MachineryContext";
+
+interface SearchFilters {
+  query: string;
+  type: string;
+  maxDistance: string;
+}
 
 interface Machinery {
   id: string;
   name: string;
   type: string;
-  category: string;
   rate: number;
   available: boolean;
-  owner: {
-    id: string;
-    name: string;
-    phone: string;
-    email: string;
-  };
+  description?: string;
   location: {
     state: string;
     district: string;
     taluk: string;
     village: string;
     pincode: string;
-  };
-  coordinates?: { lat: number; lng: number };
-  distance?: number;
-  specifications: Record<string, any>;
-  images: string[];
-  description: string;
-}
-
-interface SearchResponse {
-  machinery: Machinery[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalResults: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
-  filters: {
-    availableTypes: string[];
-    priceRange: {
-      min: number;
-      max: number;
+    coordinates?: {
+      lat: number;
+      lng: number;
     };
   };
+  owner: {
+    id: string;
+    name: string;
+    phone: string;
+    email: string;
+  };
+  specifications: Record<string, string>;
+  images: string[];
+  distance?: number;
 }
 
 export default function MachineryList() {
+  const { machinery: allMachinery } = useMachinery();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [maxDistance, setMaxDistance] = useState<string>("all");
-  const [selectedMachinery, setSelectedMachinery] = useState<Machinery | null>(null);
-  const [machinery, setMachinery] = useState<Machinery[]>([]);
-  const [filteredMachinery, setFilteredMachinery] = useState<Machinery[]>([]);
+  const [selectedMachinery, setSelectedMachinery] = useState<any>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [filteredMachinery, setFilteredMachinery] = useState(allMachinery);
+  const [loading, setLoading] = useState(false);
+  
   const { toast } = useToast();
   const { latitude, longitude, error: locationError, loading: locationLoading } = useGeolocation();
-
-  // Fetch machinery data from API
+  
+  // Update filtered machinery when filters or data changes
   useEffect(() => {
-    fetchMachinery();
-  }, [searchQuery, selectedType]);
-
-  // Filter machinery based on distance and other criteria
-  useEffect(() => {
-    let filtered = [...machinery];
-
-    // Add coordinates and calculate distances
-    if (latitude && longitude) {
-      filtered = filtered.map(machine => {
-        const coords = getCoordinatesFromLocation(machine.location);
-        const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-        return {
-          ...machine,
-          coordinates: coords,
-          distance
-        };
-      });
-
-      // Filter by distance if specified
-      if (maxDistance !== "all") {
-        const maxDist = parseInt(maxDistance);
-        filtered = filtered.filter(machine => machine.distance! <= maxDist);
-      }
-
-      // Sort by distance (closest first)
-      filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-    } else {
-      // Add coordinates even without user location
-      filtered = filtered.map(machine => ({
-        ...machine,
-        coordinates: getCoordinatesFromLocation(machine.location)
-      }));
-    }
-
-    setFilteredMachinery(filtered);
-  }, [machinery, latitude, longitude, maxDistance]);
-
-  const fetchMachinery = async () => {
     setLoading(true);
     try {
-      const queryParams = new URLSearchParams();
-      if (searchQuery) queryParams.append('query', searchQuery);
-      if (selectedType !== 'all') queryParams.append('type', selectedType);
-      queryParams.append('available', 'true'); // Only show available machinery
-      
-      // For demo purposes, using mock data since API might not be available
-      // Replace this with actual API call when backend is ready
-      const mockMachinery: Machinery[] = [
-        {
-          id: "1",
-          name: "John Deere 5075E",
-          type: "tractor",
-          category: "Tractor",
-          rate: 500,
-          available: true,
-          owner: { id: "1", name: "Rajesh Kumar", phone: "+91 98765 43210", email: "rajesh@example.com" },
-          location: { state: "Punjab", district: "Amritsar", taluk: "Ajnala", village: "Bhikhiwind", pincode: "143109" },
-          specifications: { "Engine Power": "75 HP", "Fuel Type": "Diesel" },
-          images: [],
-          description: "Well-maintained tractor suitable for all farming operations"
-        },
-        {
-          id: "2",
-          name: "Mahindra 575 DI",
-          type: "tractor",
-          category: "Tractor",
-          rate: 450,
-          available: true,
-          owner: { id: "2", name: "Suresh Patel", phone: "+91 98765 43211", email: "suresh@example.com" },
-          location: { state: "Punjab", district: "Ludhiana", taluk: "Samrala", village: "Doraha", pincode: "141421" },
-          specifications: { "Engine Power": "75 HP", "Fuel Type": "Diesel" },
-          images: [],
-          description: "Reliable tractor with excellent fuel efficiency"
-        },
-        {
-          id: "3",
-          name: "Class Lexion 780",
-          type: "harvester",
-          category: "Harvester",
-          rate: 1200,
-          available: false,
-          owner: { id: "3", name: "Priya Sharma", phone: "+91 98765 43212", email: "priya@example.com" },
-          location: { state: "Haryana", district: "Karnal", taluk: "Assandh", village: "Nilokheri", pincode: "132117" },
-          specifications: { "Cutting Width": "35 feet", "Tank Capacity": "10000 L" },
-          images: [],
-          description: "High-capacity combine harvester for large fields"
-        },
-        {
-          id: "4",
-          name: "New Holland TC5070",
-          type: "tractor",
-          category: "Tractor",
-          rate: 480,
-          available: true,
-          owner: { id: "4", name: "Amit Singh", phone: "+91 98765 43213", email: "amit@example.com" },
-          location: { state: "Punjab", district: "Jalandhar", taluk: "Phillaur", village: "Nakodar", pincode: "144040" },
-          specifications: { "Engine Power": "70 HP", "Fuel Type": "Diesel" },
-          images: [],
-          description: "Modern tractor with advanced features"
-        }
-      ];
+      let filtered = [...allMachinery];
 
-      // Apply filters to mock data
-      let filtered = mockMachinery;
+      // Filter by search query
       if (searchQuery) {
+        const query = searchQuery.toLowerCase();
         filtered = filtered.filter(machine => 
-          machine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          machine.location.village.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          machine.location.district.toLowerCase().includes(searchQuery.toLowerCase())
+          machine.name.toLowerCase().includes(query) ||
+          (machine.description?.toLowerCase().includes(query) ?? false) ||
+          (machine.location?.village?.toLowerCase().includes(query) ?? false) ||
+          (machine.location?.district?.toLowerCase().includes(query) ?? false)
         );
       }
+
+      // Filter by type
       if (selectedType !== 'all') {
         filtered = filtered.filter(machine => machine.type === selectedType);
       }
 
-      setMachinery(filtered);
+      // Add coordinates and calculate distances if location is available
+      if (latitude && longitude) {
+        filtered = filtered.map(machine => {
+          const coords = machine.location?.coordinates || { lat: 0, lng: 0 };
+          const distance = calculateDistance(
+            latitude, 
+            longitude, 
+            coords.lat, 
+            coords.lng
+          );
+          return {
+            ...machine,
+            distance
+          };
+        });
+
+        // Filter by distance if specified
+        if (maxDistance !== "all") {
+          const maxDist = parseInt(maxDistance);
+          filtered = filtered.filter(machine => 
+            machine.distance !== undefined && machine.distance <= maxDist
+          );
+        }
+
+        // Sort by distance (closest first)
+        filtered.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      }
+
+      setFilteredMachinery(filtered);
     } catch (error) {
-      console.error('Error fetching machinery:', error);
+      console.error('Error filtering machinery:', error);
       toast({
         title: "Error",
-        description: "Failed to load machinery. Please try again.",
+        description: "Failed to filter machinery. Please try again.",
         variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [allMachinery, searchQuery, selectedType, maxDistance, latitude, longitude, toast]);
 
   const handleBook = (id: string) => {
-    const machine = machinery.find((m) => m.id === id);
+    const machine = allMachinery.find((m: any) => m.id === id);
     if (machine) {
       setSelectedMachinery(machine);
       setIsBookingModalOpen(true);
@@ -246,20 +170,26 @@ export default function MachineryList() {
           </div>
         )}
 
-        {/* View Mode Toggle */}
-        <div className="mb-6">
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "list" | "map")}>
-            <TabsList>
-              <TabsTrigger value="list" className="flex items-center gap-2">
-                <List className="h-4 w-4" />
-                List View
-              </TabsTrigger>
-              <TabsTrigger value="map" className="flex items-center gap-2">
-                <Map className="h-4 w-4" />
-                Map View
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+        {/* View toggle button */}
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewMode(viewMode === "list" ? "map" : "list")}
+            className="ml-2"
+          >
+            {viewMode === "list" ? (
+              <>
+                <MapIcon className="h-4 w-4 mr-2" />
+                Show Map
+              </>
+            ) : (
+              <>
+                <List className="h-4 w-4 mr-2" />
+                Show List
+              </>
+            )}
+          </Button>
         </div>
 
         {/* Filters */}
@@ -325,12 +255,16 @@ export default function MachineryList() {
         ) : (
           <div>
             {viewMode === "map" ? (
-              <MachineryMap
-                machinery={filteredMachinery}
-                userLocation={latitude && longitude ? { lat: latitude, lng: longitude } : null}
-                onMachinerySelect={handleBook}
-                className="mb-6"
-              />
+              <div className="h-[500px] rounded-lg overflow-hidden border flex items-center justify-center bg-gray-100">
+                <div className="text-center p-4">
+                  <MapPin className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium">Map View</h3>
+                  <p className="text-gray-500 mt-2">Map integration coming soon</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    {filteredMachinery.length} machines available in this area
+                  </p>
+                </div>
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredMachinery.map((machine) => (
@@ -338,7 +272,7 @@ export default function MachineryList() {
                     key={machine.id}
                     id={machine.id}
                     name={machine.name}
-                    type={machine.category}
+                    type={machine.type}
                     rate={machine.rate}
                     location={`${machine.location.village}, ${machine.location.taluk}, ${machine.location.district}, ${machine.location.state}`}
                     available={machine.available}

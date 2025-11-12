@@ -3,6 +3,7 @@ import { OwnerRegistrationForm } from "@/components/OwnerRegistrationForm";
 import { authService } from "@/services/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useMachinery } from "@/context/MachineryContext";
 
 interface OwnerRegistrationData {
   name: string;
@@ -12,6 +13,7 @@ interface OwnerRegistrationData {
   location: {
     state: string;
     district: string;
+    taluk: string;
     village: string;
     pincode: string;
   };
@@ -30,6 +32,7 @@ export default function OwnerRegistration() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { addMachinery } = useMachinery();
 
   const handleRegistration = async (data: OwnerRegistrationData) => {
     setIsLoading(true);
@@ -50,13 +53,29 @@ export default function OwnerRegistration() {
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
+      // Add machinery to context if provided during registration
+      if (data.machinery && data.machinery.length > 0) {
+        data.machinery.forEach(machine => {
+          addMachinery({
+            name: machine.name,
+            type: machine.type,
+            rate: machine.rate,
+            available: true,
+            description: machine.description,
+            location: data.location
+          });
+        });
+      }
+      
       toast({
         title: "Registration Successful!",
         description: "Welcome to FarmShare! Your machinery owner account has been created.",
       });
       
       // Redirect to owner dashboard
-      navigate('/dashboard/owner');
+      setTimeout(() => {
+        navigate('/dashboard/owner');
+      }, 500);
     } catch (error) {
       toast({
         title: "Registration Failed",

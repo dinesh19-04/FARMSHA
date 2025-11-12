@@ -54,7 +54,9 @@ export default function CustomerRegistration() {
       });
       
       // Redirect to farmer dashboard (customers use farmer dashboard)
-      navigate('/dashboard/farmer');
+      setTimeout(() => {
+        navigate('/dashboard/farmer');
+      }, 500);
     } catch (error) {
       toast({
         title: "Registration Failed",

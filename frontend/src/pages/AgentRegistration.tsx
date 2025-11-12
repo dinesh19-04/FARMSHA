@@ -54,7 +54,9 @@ export default function AgentRegistration() {
       });
       
       // Redirect to agent dashboard
-      navigate('/dashboard/agent');
+      setTimeout(() => {
+        navigate('/dashboard/agent');
+      }, 500);
     } catch (error) {
       toast({
         title: "Registration Failed",
