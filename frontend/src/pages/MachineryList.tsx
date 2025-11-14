@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List, MapPin, Navigation } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2, Map as MapIcon, List, MapPin, Navigation, Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { calculateDistance } from "@/utils/distance";
 import { useMachinery } from "@/context/MachineryContext";
+import { addSampleMachine, addMultipleSampleMachines } from "@/utils/addSampleMachine";
 
 interface SearchFilters {
   query: string;
@@ -58,6 +59,7 @@ export default function MachineryList() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [filteredMachinery, setFilteredMachinery] = useState(allMachinery);
   const [loading, setLoading] = useState(false);
+  const [isAddingMachines, setIsAddingMachines] = useState(false);
   
   const { toast } = useToast();
   const { latitude, longitude, error: locationError, loading: locationLoading } = useGeolocation();
@@ -170,13 +172,55 @@ export default function MachineryList() {
           </div>
         )}
 
-        {/* View toggle button */}
-        <div className="flex justify-end mb-4">
+        {/* Action buttons */}
+        <div className="flex justify-between mb-4">
+          <div className="relative group">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => addSampleMachine()}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Sample Machine
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+            <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-10 hidden group-hover:block">
+              <div className="py-1">
+                <button
+                  onClick={async () => {
+                    setIsAddingMachines(true);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const machines = addMultipleSampleMachines(5);
+                    setIsAddingMachines(false);
+                    toast({
+                      title: "Machines Added",
+                      description: `Successfully added ${machines.length} sample machines.`,
+                    });
+                  }}
+                  disabled={isAddingMachines}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  {isAddingMachines ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4" />
+                      Add 5 Random Machines
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setViewMode(viewMode === "list" ? "map" : "list")}
-            className="ml-2"
+            className="flex items-center gap-2"
           >
             {viewMode === "list" ? (
               <>
