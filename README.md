@@ -1,14 +1,18 @@
-# FarmShare
+# FARMSHA - Smart Agricultural Machinery Sharing Platform
 
-A modern agricultural machinery sharing platform built with React and Node.js.
+A comprehensive platform connecting farmers with machinery owners and agents, enabling seamless booking and management of agricultural equipment similar to Uber/Rapido for farm machinery.
 
 ## Features
 
-- **Farmer Dashboard**: Browse and book agricultural machinery
-- **Owner Dashboard**: List and manage your machinery
-- **Agent Dashboard**: Verify users and manage regional operations
-- **Real-time Booking System**: Seamless machinery rental process
-- **Responsive Design**: Works on all devices
+- **Farmer Module**: Search, filter, and book machinery with live GPS tracking
+- **Machinery Owner Module**: Add machinery, manage bookings, track earnings
+- **Agent Module**: Coordinate between farmers and owners, manage disputes
+- **Advanced Search & Filtering**: State → District → Village + Live GPS Location
+- **Real-time Notifications**: Booking updates, GPS tracking, work status
+- **Rating & Review System**: Farmer and machinery ratings
+- **Live Booking Tracking**: Real-time tracking like Uber
+- **OTP/Mobile Login**: Secure authentication for rural users
+- **Responsive Design**: Optimized for web and mobile app conversion
 
 ## Tech Stack
 

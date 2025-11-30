@@ -8,7 +8,7 @@ export default function Landing() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section 
+      <section
         className="relative min-h-[600px] flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${heroFarm})`,
@@ -25,10 +25,10 @@ export default function Landing() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild variant="hero" size="lg">
-              <Link to="/machinery">Find Machinery</Link>
+              <Link to="/dashboard/farmer">Find Machinery</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
-              <Link to="/auth">List Your Machine</Link>
+              <Link to="/farmsha-auth">List Your Machine</Link>
             </Button>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function Landing() {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="text-center shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-hover)] transition-[var(--transition-smooth)]">
               <CardContent className="pt-12 pb-8">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -62,7 +62,7 @@ export default function Landing() {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="text-center shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-hover)] transition-[var(--transition-smooth)]">
               <CardContent className="pt-12 pb-8">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -90,7 +90,7 @@ export default function Landing() {
                 <p className="text-muted-foreground">Save money by renting equipment only when needed instead of buying</p>
               </div>
             </div>
-            
+
             <div className="flex gap-4">
               <Zap className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <div>
@@ -98,7 +98,7 @@ export default function Landing() {
                 <p className="text-muted-foreground">Get the machinery you need within hours, not days</p>
               </div>
             </div>
-            
+
             <div className="flex gap-4">
               <Shield className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <div>
@@ -106,7 +106,7 @@ export default function Landing() {
                 <p className="text-muted-foreground">All users and equipment verified by local agents</p>
               </div>
             </div>
-            
+
             <div className="flex gap-4">
               <Users className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <div>
@@ -132,7 +132,7 @@ export default function Landing() {
                 <div className="text-sm text-muted-foreground">Wheat Farmer, Punjab</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="pt-8">
                 <p className="text-muted-foreground mb-4">
@@ -142,7 +142,7 @@ export default function Landing() {
                 <div className="text-sm text-muted-foreground">Equipment Owner, Maharashtra</div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="pt-8">
                 <p className="text-muted-foreground mb-4">
@@ -164,7 +164,7 @@ export default function Landing() {
             Join thousands of farmers already sharing machinery in your community
           </p>
           <Button asChild variant="outline" size="lg" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-            <Link to="/auth">Create Free Account</Link>
+            <Link to="/farmsha-auth">Create Free Account</Link>
           </Button>
         </div>
       </section>

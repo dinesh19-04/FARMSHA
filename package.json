@@ -1,7 +1,7 @@
 {
-  "name": "farmshare-monorepo",
+  "name": "farmsha-platform",
   "version": "1.0.0",
-  "description": "FarmShare - Agricultural Machinery Sharing Platform",
+  "description": "FARMSHA - Smart Machinery Sharing System for Farmers (Like Uber for Agricultural Equipment)",
   "scripts": {
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
@@ -12,7 +12,7 @@
     "install:backend": "cd backend && npm install",
     "install:all": "npm run install:frontend && npm run install:backend"
   },
-  "keywords": ["farmshare", "agriculture", "machinery", "sharing", "platform"],
+  "keywords": ["farmsha", "agriculture", "machinery", "sharing", "platform", "farmer", "tractor", "equipment"],
   "author": "",
   "license": "ISC",
   "workspaces": ["frontend", "backend"]
